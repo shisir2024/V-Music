@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>V-Music Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8a2be2; /* Vibrant violet */
+            --primary-dark: #7b1fa2;
+            --secondary: #00d1b2; /* Teal accent */
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --gray: #dfe6e9;
+            --success: #00b894;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, #4b0082 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark);
+        }
+
+        .player {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 2.5rem;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 .v-logo {
+            color: var(--secondary);
+            font-style: italic;
+            font-weight: 800;
+        }
+
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        #status {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 500;
+            color: var(--dark);
+            background: var(--gray);
+            padding: 12px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls,
+        .volume,
+        .voice-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+
+        .controls button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(138, 43, 226, 0.3);
+        }
+
+        .controls button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(138, 43, 226, 0.4);
+        }
+
+        .controls button:active {
+            transform: translateY(0);
+        }
+
+        #playPauseBtn {
+            width: 70px;
+            height: 70px;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .volume {
+            flex-direction: column;
+            margin-top: 30px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 250px;
+            gap: 10px;
+        }
+
+        .volume span {
+            font-weight: 500;
+            color: var(--dark);
+            min-width: 70px;
+            text-align: right;
+        }
+
+        .volume input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--gray);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .volume input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .volume input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .voice-control button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0, 209, 178, 0.3);
+        }
+
+        .voice-control button:hover {
+            background-color: #00b89a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 209, 178, 0.4);
+        }
+
+        .voice-control button:active {
+            transform: translateY(0);
+        }
+
+        .playlist {
+            margin-top: 30px;
+        }
+
+        .playlist h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .playlist h2:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        .playlist h3 {
+            margin-top: 25px;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--gray);
+            padding-bottom: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .playlist h3 i {
+            color: var(--secondary);
+        }
+
+        .song-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .song {
+            background-color: var(--gray);
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1 0 calc(50% - 12px);
+            text-align: center;
+            font-weight: 400;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .song:hover {
+            background-color: #d1d8e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .song.playing {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+        }
+
+        .song.playing:after {
+            content: '\f04b';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 480px) {
+            .player {
+                padding: 20px;
+            }
+            
+            .song {
+                flex: 1 0 100%;
+            }
+            
+            .controls button {
+                width: 45px;
+                height: 45px;
+            }
+            
+            #playPauseBtn {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="player">
+        <h1><span class="v-logo">V</span>-Music Player</h1>
+        <div id="status">Ready to play</div>
+        <div class="controls">
+            <button onclick="previousSong()"><i class="fas fa-step-backward"></i></button>
+            <button onclick="playPause()" id="playPauseBtn"><i class="fas fa-play"></i></button>
+            <button onclick="nextSong()"><i class="fas fa-step-forward"></i></button>
+        </div>
+        <div class="volume">
+            <div class="volume-control">
+                <span>Volume</span>
+                <input type="range" min="0" max="1" step="0.1" value="1" onchange="setVolume(this.value)">
+            </div>
+        </div>
+        <div class="voice-control">
+            <button onclick="toggleVoice()" id="voiceBtn">
+                <i class="fas fa-microphone"></i> Enable Voice Control
+            </button>
+        </div>
+        <div class="playlist">
+            <h2>Your Playlist</h2>
+            {% for category, song_list in songs.items() %}
+                <h3><i class="fas fa-music"></i> {{ category }}</h3>
+                <div class="song-section">
+                    {% for song in song_list %}
+                        <div class="song" data-index="{{ loop.index0 }}" data-category="{{ category }}" onclick="playSong(this)">
+                            {{ song }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = null;
+        let currentIndex = null;
+        let isPlaying = false;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        let voiceEnabled = false;
+
+        function updateStatus(text) {
+            document.getElementById("status").innerText = text;
+        }
+
+    function playSong(element) {
+    const index = parseInt(element.getAttribute("data-index"));
+    const category = element.getAttribute("data-category");
+    
+    fetch(`/play/${encodeURIComponent(category)}/${index}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                updateStatus(`Now Playing: ${data.song}`);
+                highlightPlayingSong(data.category, data.index);
+                document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                updateStatus(`Error: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            updateStatus('Error playing song');
+        });
+}
+        function playPause() {
+            if (!isPlaying && currentCategory !== null && currentIndex !== null) {
+                playSong(document.querySelector(`.song[data-category='${currentCategory}'][data-index='${currentIndex}']`));
+            } else if (isPlaying) {
+                fetch('/pause', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(() => {
+                        updateStatus("Paused");
+                        isPlaying = false;
+                        document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-play"></i>';
+                    });
+            } else {
+                fetch('/play', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(() => {
+                        updateStatus("Resumed");
+                        isPlaying = true;
+                        document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-pause"></i>';
+                    });
+            }
+        }
+
+        function nextSong() {
+            fetch('/next')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        updateStatus(`Now Playing: ${data.song}`);
+                        if (data.category && data.index !== undefined) {
+                            currentCategory = data.category;
+                            currentIndex = data.index;
+                            highlightPlayingSong(data.category, data.index);
+                            isPlaying = true;
+                            document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-pause"></i>';
+                        }
+                    }
+                });
+        }
+function previousSong() {
+    fetch('/prev', { method: 'GET' })  // changed from '/previous' to '/prev'
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                updateStatus(`Now Playing: ${data.song}`);
+                if (data.category && data.index !== undefined) {
+                    currentCategory = data.category;
+                    currentIndex = data.index;
+                    highlightPlayingSong(data.category, data.index);
+                    isPlaying = true;
+                    document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-pause"></i>';
+                }
+            }
+        });
+}
+
+
+        function setVolume(value) {
+            fetch(`/volume/${value}`)
+                .then(res => res.json())
+                .then(() => updateStatus(`Volume: ${Math.round(value * 100)}%`));
+        }
+
+        function toggleVoice() {
+            voiceEnabled = !voiceEnabled;
+            const voiceBtn = document.getElementById("voiceBtn");
+
+            if (voiceEnabled) {
+                if (!recognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = true;
+                    recognition.interimResults = false;
+                    recognition.lang = "en-US";
+
+                    recognition.onresult = (event) => {
+                        const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+                        updateStatus("Voice Command: " + command);
+                        handleVoiceCommand(command);
+                    };
+
+                    recognition.onerror = (event) => {
+                        console.error("Speech recognition error:", event.error);
+                        updateStatus("Voice error: " + event.error);
+                    };
+                }
+
+                recognition.start();
+                voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Disable Voice Control';
+                updateStatus("Voice Control Enabled. Say 'Play', 'Pause', 'Next', or 'Previous'.");
+            } else {
+                recognition.stop();
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Enable Voice Control';
+                updateStatus("Voice Control Disabled.");
+            }
+
+            fetch(`/voice/${voiceEnabled ? 1 : 0}`);  // Optional: Notify backend
+        }
+
+        function handleVoiceCommand(command) {
+            if (command.includes("play")) {
+                playPause();
+            } else if (command.includes("pause")) {
+                fetch("/pause", { method: "POST" }).then(() => {
+                    updateStatus("Paused");
+                    isPlaying = false;
+                    document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-play"></i>';
+                });
+            } else if (command.includes("next")) {
+                nextSong();
+            } else if (command.includes("previous") || command.includes("back")) {
+                previousSong();
+            } else {
+                updateStatus("Command not recognized.");
+            }
+        }
+
+        function highlightPlayingSong(category, index) {
+            document.querySelectorAll('.song').forEach(el => el.classList.remove('playing'));
+            const selector = `.song[data-category='${category}'][data-index='${index}']`;
+            const songElement = document.querySelector(selector);
+            if (songElement) {
+                songElement.classList.add('playing');
+            }
+        }
+    </script>
+</body>
+</html>
+
